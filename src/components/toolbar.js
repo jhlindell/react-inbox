@@ -7,7 +7,7 @@ class Toolbar extends React.Component {
       <div className="row toolbar">
         <div className="col-md-12">
           <p className="pull-right">
-            <span className="badge badge">2</span>
+            <span className="badge badge">{this.props.unreadCount}</span>
             unread messages
           </p>
 
@@ -37,7 +37,7 @@ class Toolbar extends React.Component {
             <option value="gschool">gschool</option>
           </select>
 
-          <button className="btn btn-default">
+          <button className="btn btn-default" onClick={this.props.deleteMessage}>
             <i className="fa fa-trash-o"></i>
           </button>
         </div>

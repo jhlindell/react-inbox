@@ -168,6 +168,25 @@ state = {
     this.setState({messages:this.state.messages});
   }
 
+  deleteMessage = () => {
+    let messages = this.state.messages;
+    for(let i =0; i < messages.length; i++) {
+      if(messages[i].checked === true){
+        messages.splice(i ,1);
+      }
+    }
+    this.setState({messages:this.state.messages});
+  }
+
+  getUnreadCount = () => {
+    return this.state.messages.reduce((acc, curr) => {
+      if(!curr.read){
+        acc++;
+      }
+      return acc;
+    }, 0);
+  }
+
   render() {
     return (
       <div className="App">
@@ -177,7 +196,9 @@ state = {
           bulkSelect={this.bulkSelect}
           bulkStatus={this.state.bulkStatus}
           addLabel={this.addLabel}
-          removeLabel={this.removeLabel}/>
+          removeLabel={this.removeLabel}
+          deleteMessage={this.deleteMessage}
+          unreadCount={this.getUnreadCount()}/>
 
           <MessageList messages={this.state.messages} changeReadState={this.changeReadState} onCheckChange={this.onCheckChange}
           onStarChange={this.onStarChange}/>
