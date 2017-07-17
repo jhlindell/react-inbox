@@ -15,29 +15,31 @@ class Toolbar extends React.Component {
             <i className={this.props.bulkStatus}></i>
           </button>
 
-          <button className="btn btn-default" onClick={this.props.markRead}>
+          <button className="btn btn-default" onClick={this.props.markRead}
+          disabled={!this.props.selectedItemCount}>
             Mark As Read
           </button>
 
-          <button className="btn btn-default" onClick={this.props.markUnread}>
+          <button className="btn btn-default" onClick={this.props.markUnread}
+          disabled={!this.props.selectedItemCount}>
             Mark As Unread
           </button>
 
-          <select className="form-control label-select" onChange={(e) => {this.props.addLabel(e.target.value)}}>
+          <select className="form-control label-select" onChange={(e) => {this.props.addLabel(e.target.value)}} disabled={!this.props.selectedItemCount}>
             <option>Apply label</option>
             <option value="dev">dev</option>
             <option value="personal">personal</option>
             <option value="gschool">gschool</option>
           </select>
 
-          <select className="form-control label-select" onChange={(e) => {this.props.removeLabel(e.target.value)}}>
+          <select className="form-control label-select" onChange={(e) => {this.props.removeLabel(e.target.value)}} disabled={!this.props.selectedItemCount}>
             <option>Remove label</option>
             <option value="dev">dev</option>
             <option value="personal">personal</option>
             <option value="gschool">gschool</option>
           </select>
 
-          <button className="btn btn-default" onClick={this.props.deleteMessage}>
+          <button className="btn btn-default" onClick={this.props.deleteMessage} disabled={!this.props.selectedItemCount}>
             <i className="fa fa-trash-o"></i>
           </button>
         </div>

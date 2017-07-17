@@ -7,6 +7,7 @@ import MessageList from './components/messageList.js';
 class App extends Component {
 state = {
     bulkStatus: 'fa fa-square-o',
+    selectedItemCount: 0,
     messages: [
     {
       "id": 1,
@@ -104,6 +105,7 @@ state = {
     event.persist();
     message.checked = !message.checked;
     this.checkBulkStatus();
+    this.getSelectedItemCount();
     this.setState({messages:this.state.messages});
   }
 
@@ -140,11 +142,14 @@ state = {
       for(let j = 0; j< messages.length; j++) {
         messages[j].checked = true;
       }
+      this.checkBulkStatus();
     } else {
       for(let k = 0; k< messages.length; k++) {
         messages[k].checked = false;
       }
+      this.checkBulkStatus();
     }
+    this.getSelectedItemCount();
     this.setState({messages:this.state.messages});
   }
 
@@ -175,6 +180,7 @@ state = {
         messages.splice(i ,1);
       }
     }
+    this.getSelectedItemCount();
     this.setState({messages:this.state.messages});
   }
 
@@ -185,6 +191,17 @@ state = {
       }
       return acc;
     }, 0);
+  }
+
+  getSelectedItemCount = () => {
+    let messages = this.state.messages;
+    let count = 0;
+    for(let i = 0; i < messages.length; i++){
+      if(messages[i].checked){
+        ++count;
+      }
+    }
+    this.setState({selectedItemCount:count});
   }
 
   render() {
@@ -198,7 +215,8 @@ state = {
           addLabel={this.addLabel}
           removeLabel={this.removeLabel}
           deleteMessage={this.deleteMessage}
-          unreadCount={this.getUnreadCount()}/>
+          unreadCount={this.getUnreadCount()}
+          selectedItemCount={this.state.selectedItemCount}/>
 
           <MessageList messages={this.state.messages} changeReadState={this.changeReadState} onCheckChange={this.onCheckChange}
           onStarChange={this.onStarChange}/>
