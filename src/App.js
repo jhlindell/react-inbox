@@ -2,89 +2,106 @@ import React, { Component } from 'react';
 import './App.css';
 import Toolbar from './components/toolbar.js';
 import MessageList from './components/messageList.js';
-
+import ComposeForm from './components/composeForm.js';
 
 class App extends Component {
-state = {
-    bulkStatus: 'fa fa-square-o',
-    selectedItemCount: 0,
-    messages: [
-    {
-      "id": 1,
-      "subject": "You can't input the protocol without calculating the mobile RSS protocol!",
-      "read": false,
-      "starred": true,
-      "labels": ["dev", "personal"],
-      "checked": false,
-      "showMessage": false
-    },
-    {
-      "id": 2,
-      "subject": "connecting the system won't do anything, we need to input the mobile AI panel!",
-      "read": false,
-      "starred": false,
-      "selected": true,
-      "labels": [],
-      "checked": false,
-      "showMessage": false
-    },
-    {
-      "id": 3,
-      "subject": "Use the 1080p HTTP feed, then you can parse the cross-platform hard drive!",
-      "read": false,
-      "starred": true,
-      "labels": ["dev"],
-      "checked": false,
-      "showMessage": false
-    },
-    {
-      "id": 4,
-      "subject": "We need to program the primary TCP hard drive!",
-      "read": true,
-      "starred": false,
-      "selected": true,
-      "labels": [],
-      "checked": false,
-      "showMessage": false
-    },
-    {
-      "id": 5,
-      "subject": "If we override the interface, we can get to the HTTP feed through the virtual EXE interface!",
-      "read": false,
-      "starred": false,
-      "labels": ["personal"],
-      "checked": false,
-      "showMessage": false
-    },
-    {
-      "id": 6,
-      "subject": "We need to back up the wireless GB driver!",
-      "read": true,
-      "starred": true,
-      "labels": [],
-      "checked": false,
-      "showMessage": false
-    },
-    {
-      "id": 7,
-      "subject": "We need to index the mobile PCI bus!",
-      "read": true,
-      "starred": false,
-      "labels": ["dev", "personal"],
-      "checked": false,
-      "showMessage": false
-    },
-    {
-      "id": 8,
-      "subject": "If we connect the sensor, we can get to the HDD port through the redundant IB firewall!",
-      "read": true,
-      "starred": true,
-      "labels": [],
-      "checked": false,
-      "showMessage": false
+  state = {
+      showForm: false,
+      bulkStatus: 'fa fa-square-o',
+      selectedItemCount: 0,
+      messages: [],
+      subject: "",
+      body: ""
+  }
+
+  async componentDidMount() {
+    const response = await fetch('http://localhost:8181/api/messages')
+    const json = await response.json();
+    this.setState({messages: json._embedded.messages})
+  }
+
+  saveMessage = (event) => {
+    event.persist();
+    event.preventDefault();
+    let message = {};
+    message.subject = this.state.subject;
+    message.body = this.state.body;
+    message.read = false;
+    message.starred = false;
+    message.labels = [];
+    this.setState({showForm:false});
+    this.persistMessage(message);
+  }
+
+  async persistMessage(message) {
+    const response = await fetch('http://localhost:8181/api/messages', {
+      method: 'POST',
+      body: JSON.stringify(message),
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+      }
+    });
+    const returnedMessage = await response.json();
+    this.setState({messages: [...this.state.messages, returnedMessage]});
+  }
+
+  async patchMessage(message, command, label){
+    let patchBody = {};
+    switch(command){
+      case 'star':
+        patchBody = {
+          "messageIds": [message.id],
+          "command": "star",
+          "star": message.starred
+        }
+        break;
+
+      case 'read':
+        patchBody = {
+          "messageIds": [message.id],
+          "command": "read",
+          "read": message.read
+        }
+        break;
+
+      case 'delete':
+        patchBody = {
+          "messageIds": [message.id],
+          "command": "delete"
+        }
+        break;
+
+      case 'addLabel':
+        patchBody = {
+          "messageIds": [message.id],
+          "command": "addLabel",
+          "label": label
+        }
+        break;
+
+      case 'removeLabel':
+        patchBody = {
+          "messageIds": [message.id],
+          "command": "removeLabel",
+          "label": label
+        }
+        break;
+
+      default:
+        break;
     }
-  ]
-}
+
+    const response = await fetch('http://localhost:8181/api/messages', {
+      method: 'PATCH',
+      body: JSON.stringify(patchBody),
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+      }
+    });
+    this.setState({messages: this.state.messages});
+  }
 
   changeReadState = (message) => {
     if(!message.read){
@@ -96,16 +113,16 @@ state = {
     this.hideAllMessageBodies();
       message.showMessage = true;
     }
+    this.patchMessage(message, "read");
     this.setState({messages:this.state.messages});
   }
-
-
 
   markRead = () => {
     let messages = this.state.messages;
     for(let i = 0; i < messages.length; i++){
       if(messages[i].checked === true && messages[i].read === false){
         messages[i].read = true;
+        this.patchMessage(messages[i], "read");
       }
     }
     this.setState({messages:this.state.messages});
@@ -116,6 +133,7 @@ state = {
     for(let i = 0; i < messages.length; i++){
       if(messages[i].checked === true && messages[i].read === true){
         messages[i].read = false;
+        this.patchMessage(messages[i], "read");
       }
     }
     this.setState({messages:this.state.messages});
@@ -152,6 +170,7 @@ state = {
   onStarChange = (event, message) => {
     event.persist();
     message.starred = !message.starred;
+    this.patchMessage(message, "star");
     this.setState({messages:this.state.messages});
   }
 
@@ -178,6 +197,7 @@ state = {
     for(let i = 0; i < messages.length; i++){
       if(messages[i].checked === true && !messages[i].labels.includes(value)){
         messages[i].labels.push(value);
+        this.patchMessage(messages[i], "addLabel", value);
       }
     }
     this.setState({messages:this.state.messages});
@@ -187,6 +207,7 @@ state = {
     let messages = this.state.messages;
     for(let i = 0; i < messages.length; i++){
       if(messages[i].checked === true && messages[i].labels.includes(value)){
+        this.patchMessage(messages[i], "removeLabel", value);
         messages[i].labels.splice(messages[i].labels.indexOf(value),1);
       }
     }
@@ -197,9 +218,11 @@ state = {
     let messages = this.state.messages;
     for(let i =0; i < messages.length; i++) {
       if(messages[i].checked === true){
+        this.patchMessage(messages[i], "delete");
         messages.splice(i ,1);
       }
     }
+
     this.getSelectedItemCount();
     this.setState({messages:this.state.messages});
   }
@@ -231,11 +254,20 @@ state = {
     }
   }
 
+  formHandleChange = (e) => {
+    this.setState({[e.target.name]:e.target.value});
+  }
+
+  showFormClick = () => {
+    this.setState({showForm: !this.state.showForm})
+  }
+
   render() {
     return (
       <div className="App">
           <h2>Welcome to React</h2>
           <Toolbar markRead={this.markRead}
+          showFormClick={this.showFormClick}
           markUnread={this.markUnread}
           bulkSelect={this.bulkSelect}
           bulkStatus={this.state.bulkStatus}
@@ -248,6 +280,12 @@ state = {
           <MessageList messages={this.state.messages} changeReadState={this.changeReadState} onCheckChange={this.onCheckChange}
           onStarChange={this.onStarChange}
           showMessage={this.state.messages.showMessage}/>
+
+          <ComposeForm
+          saveMessage={this.saveMessage}
+          formData={this.state.formData}
+          handleChange={this.formHandleChange}
+          showForm={this.state.showForm}/>
       </div>
     );
   }

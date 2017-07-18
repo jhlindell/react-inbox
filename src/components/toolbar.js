@@ -11,6 +11,10 @@ class Toolbar extends React.Component {
             unread messages
           </p>
 
+          <button className="btn btn-danger" onClick={this.props.showFormClick}>
+            <i className="fa fa-plus" ></i>
+          </button>
+
           <button className="btn btn-default" onClick={this.props.bulkSelect}>
             <i className={this.props.bulkStatus}></i>
           </button>
