@@ -23,6 +23,12 @@ class Message extends React.Component {
             {this.props.message.subject}
           </a>
         </div>
+        {this.props.message.showMessage?
+          <div className="row message-body">
+            <div className="col-xs-11 col-xs-offset-1">
+              This is the body of the message.
+            </div>
+          </div>:null}
       </div>
     )
   }

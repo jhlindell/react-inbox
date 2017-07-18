@@ -15,7 +15,8 @@ state = {
       "read": false,
       "starred": true,
       "labels": ["dev", "personal"],
-      "checked": false
+      "checked": false,
+      "showMessage": false
     },
     {
       "id": 2,
@@ -24,7 +25,8 @@ state = {
       "starred": false,
       "selected": true,
       "labels": [],
-      "checked": false
+      "checked": false,
+      "showMessage": false
     },
     {
       "id": 3,
@@ -32,7 +34,8 @@ state = {
       "read": false,
       "starred": true,
       "labels": ["dev"],
-      "checked": false
+      "checked": false,
+      "showMessage": false
     },
     {
       "id": 4,
@@ -41,7 +44,8 @@ state = {
       "starred": false,
       "selected": true,
       "labels": [],
-      "checked": false
+      "checked": false,
+      "showMessage": false
     },
     {
       "id": 5,
@@ -49,7 +53,8 @@ state = {
       "read": false,
       "starred": false,
       "labels": ["personal"],
-      "checked": false
+      "checked": false,
+      "showMessage": false
     },
     {
       "id": 6,
@@ -57,7 +62,8 @@ state = {
       "read": true,
       "starred": true,
       "labels": [],
-      "checked": false
+      "checked": false,
+      "showMessage": false
     },
     {
       "id": 7,
@@ -65,7 +71,8 @@ state = {
       "read": true,
       "starred": false,
       "labels": ["dev", "personal"],
-      "checked": false
+      "checked": false,
+      "showMessage": false
     },
     {
       "id": 8,
@@ -73,32 +80,45 @@ state = {
       "read": true,
       "starred": true,
       "labels": [],
-      "checked": false
+      "checked": false,
+      "showMessage": false
     }
   ]
 }
 
   changeReadState = (message) => {
-    message.read = !message.read;
+    if(!message.read){
+      message.read = true;
+    }
+    if(message.showMessage){
+      message.showMessage = false;
+    }else {
+    this.hideAllMessageBodies();
+      message.showMessage = true;
+    }
     this.setState({messages:this.state.messages});
   }
+
+
 
   markRead = () => {
     let messages = this.state.messages;
     for(let i = 0; i < messages.length; i++){
       if(messages[i].checked === true && messages[i].read === false){
-        this.changeReadState(messages[i]);
+        messages[i].read = true;
       }
     }
+    this.setState({messages:this.state.messages});
   }
 
   markUnread = () => {
     let messages = this.state.messages;
     for(let i = 0; i < messages.length; i++){
       if(messages[i].checked === true && messages[i].read === true){
-        this.changeReadState(messages[i]);
+        messages[i].read = false;
       }
     }
+    this.setState({messages:this.state.messages});
   }
 
   onCheckChange = (event, message) => {
@@ -204,6 +224,13 @@ state = {
     this.setState({selectedItemCount:count});
   }
 
+  hideAllMessageBodies = () => {
+    let messages = this.state.messages;
+    for(let i = 0; i < messages.length; i++){
+      messages[i].showMessage = false;
+    }
+  }
+
   render() {
     return (
       <div className="App">
@@ -219,7 +246,8 @@ state = {
           selectedItemCount={this.state.selectedItemCount}/>
 
           <MessageList messages={this.state.messages} changeReadState={this.changeReadState} onCheckChange={this.onCheckChange}
-          onStarChange={this.onStarChange}/>
+          onStarChange={this.onStarChange}
+          showMessage={this.state.messages.showMessage}/>
       </div>
     );
   }
