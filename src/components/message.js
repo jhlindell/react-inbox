@@ -2,7 +2,6 @@ import React from "react";
 
 class Message extends React.Component {
 
-
   render() {
     return (
       <div className={`row message ${this.props.message.read ?'read': 'unread'} ${this.props.message.checked ? 'selected': ''}`}>
@@ -33,7 +32,5 @@ class Message extends React.Component {
     )
   }
 }
-
-
 
 export default Message;
