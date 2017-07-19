@@ -9,7 +9,7 @@ class Message extends React.Component {
         <div className="col-xs-1">
           <div className="row">
             <div className="col-xs-2">
-              <input type="checkbox" checked={this.props.message.checked} onChange={(e) => { this.props.onCheckChange(e, this.props.message)}}/>
+              <input type="checkbox" checked={this.props.message.checked || false} onChange={(e) => { this.props.onCheckChange(e, this.props.message)}}/>
             </div>
             <div className="col-xs-2">
               <i className={`star fa ${this.props.message.starred ?'fa-star' :'fa-star-o'}`} onClick={(e) => {

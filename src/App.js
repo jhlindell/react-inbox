@@ -6,12 +6,12 @@ import ComposeForm from './components/composeForm.js';
 
 class App extends Component {
   state = {
-      showForm: false,
-      bulkStatus: 'fa fa-square-o',
-      selectedItemCount: 0,
-      messages: [],
-      subject: "",
-      body: ""
+    showForm: false,
+    bulkStatus: 'fa fa-square-o',
+    selectedItemCount: 0,
+    messages: [],
+    subject: "",
+    body: ""
   }
 
   async componentDidMount() {
@@ -92,7 +92,7 @@ class App extends Component {
         break;
     }
 
-    const response = await fetch('http://localhost:8181/api/messages', {
+    await fetch('http://localhost:8181/api/messages', {
       method: 'PATCH',
       body: JSON.stringify(patchBody),
       headers: {
@@ -100,7 +100,6 @@ class App extends Component {
         'Accept': 'application/json',
       }
     });
-    this.setState({messages: this.state.messages});
   }
 
   changeReadState = (message) => {
@@ -141,10 +140,16 @@ class App extends Component {
 
   onCheckChange = (event, message) => {
     event.persist();
-    message.checked = !message.checked;
+    let tempMessages = [];
+    Object.assign(tempMessages, this.state.messages);
+    for(let i = 0; i < tempMessages.length; i++){
+      if(tempMessages[i].id === message.id){
+        tempMessages[i].checked = !message.checked;
+      }
+    }
     this.checkBulkStatus();
     this.getSelectedItemCount();
-    this.setState({messages:this.state.messages});
+    this.setState({messages:tempMessages});
   }
 
   checkBulkStatus(){
